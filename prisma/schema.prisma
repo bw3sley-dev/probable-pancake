@@ -1,0 +1,299 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+model Member {
+  id           String  @id @default(uuid())
+  name         String
+  email        String  @unique
+  passwordHash String  @map("password_hash")
+  avatarUrl    String? @map("avatar_url")
+
+  cpf       String?
+  birthDate DateTime? @map("birth_date")
+  gender    Gender?
+  phone     String?
+
+  role Role
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deleteAt  DateTime? @map("deleted_at")
+
+  tokens       Token[]
+  athletes     Athlete[]
+  observations Observation[]
+  areas        MemberArea[]
+
+  @@map("members")
+}
+
+enum TokenType {
+  PASSWORD_RECOVER
+}
+
+model Token {
+  id        String    @id @default(uuid())
+  type      TokenType
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId String @map("member_id")
+
+  @@map("tokens")
+}
+
+enum Specialties {
+  UNSPECIFIED
+  PSYCHOLOGY
+  PHYSIOTHERAPY
+  NUTRITION
+  NURSING
+  PSYCHOPEDAGOGY
+  PHYSICAL_EDUCATION
+}
+
+model Area {
+  id   Int          @id @default(autoincrement())
+  name Specialties @unique
+
+  threads Thread[]
+  members MemberArea[]
+
+  @@map("areas")
+}
+
+model MemberArea {
+  memberId String @map("member_id")
+  areaId   Int    @map("area_id")
+
+  member Member @relation(fields: [memberId], references: [id])
+  area   Area   @relation(fields: [areaId], references: [id])
+
+  @@id([memberId, areaId])
+  @@map("member_areas")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum BloodType {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
+
+enum Handedness {
+  RIGHT
+  LEFT
+}
+
+model Athlete {
+  id   String @id @default(uuid())
+  name String
+
+  gender     Gender
+  handedness Handedness
+  bloodType  BloodType  @map("blood_type")
+
+  birthDate DateTime @map("birth_date")
+
+  member   Member @relation(fields: [memberId], references: [id])
+  memberId String @map("member_id")
+
+  address   Address @relation(fields: [addressId], references: [id])
+  addressId Int     @unique
+
+  guardian   Guardian @relation(fields: [guardianId], references: [id])
+  guardianId Int      @unique
+
+  forms   AthleteForm[]
+  threads Thread[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("athletes")
+}
+
+model Address {
+  id Int @id @default(autoincrement())
+
+  street       String?
+  neighborhood String?
+  postalCode   String? @map("postal_code")
+  complement   String?
+  number       String?
+  city         String?
+  uf           String?
+  country      String?
+
+  athlete Athlete?
+
+  @@map("addresses")
+}
+
+model Guardian {
+  id Int @id @default(autoincrement())
+
+  name               String?
+  email              String?
+  cpf                String?
+  rg                 String?
+  relationshipDegree String? @map("relationship_degree")
+
+  gender Gender?
+
+  athlete Athlete?
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("guardians")
+}
+
+model Form {
+  id String @id @default(uuid())
+
+  name        String
+  description String?
+  slug        String  @unique
+
+  athletes AthleteForm[]
+  sections Section[]
+
+  @@map("forms")
+}
+
+model AthleteForm {
+  id String @id @default(uuid())
+
+  IAObservation String? @map("ia_observation")
+
+  athlete   Athlete @relation(fields: [athleteId], references: [id])
+  athleteId String  @map("athlete_id")
+
+  form   Form   @relation(fields: [formId], references: [id])
+  formId String @map("form_id")
+
+  answer Answer?
+
+  @@unique([athleteId, formId])
+
+  @@map("athlete_forms")
+}
+
+model Section {
+  id Int @id @default(autoincrement())
+
+  title       String
+  icon        String?
+  description String?
+
+  forms  Form   @relation(fields: [formId], references: [id])
+  formId String @map("form_id")
+
+  questions Question[]
+
+  @@map("sections")
+}
+
+enum QuestionType {
+  TEXTAREA
+  INPUT
+  CHECKBOX
+  SELECT
+  MULTI_SELECT
+  DATE
+  RADIO
+}
+
+model Question {
+  id Int @id @default(autoincrement())
+
+  description String?
+
+  required     Boolean?
+  placeholder  String?
+  defaultAnswer String?  @default("default_answer")
+
+  observation String?
+
+  type QuestionType
+
+  options Option[]
+
+  section   Section @relation(fields: [sectionId], references: [id])
+  sectionId Int     @map("section_id")
+
+  @@map("questions")
+}
+
+model Option {
+  id Int @id @default(autoincrement())
+
+  label String
+  value String
+
+  question   Question? @relation(fields: [questionId], references: [id])
+  questionId Int?
+
+  @@map("options")
+}
+
+model Answer {
+  id Int @id @default(autoincrement())
+
+  data Json
+
+  athleteForm   AthleteForm @relation(fields: [athleteFormId], references: [id])
+  athleteFormId String      @unique @map("form_id")
+
+  @@map("answers")
+}
+
+model Thread {
+  id Int @id @default(autoincrement())
+
+  athlete   Athlete @relation(fields: [athleteId], references: [id])
+  athleteId String  @map("athlete_id")
+
+  area   Area @relation(fields: [areaId], references: [id])
+  areaId Int  @map("area_id")
+
+  observations Observation[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model Observation {
+  id      Int     @id @default(autoincrement())
+  content String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  thread   Thread @relation(fields: [threadId], references: [id])
+  threadId Int    @map("thread_id")
+
+  member   Member @relation(fields: [memberId], references: [id])
+  memberId String @map("member_id")
+
+  @@map("observations")
+}
