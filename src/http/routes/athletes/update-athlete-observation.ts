@@ -9,9 +9,10 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 
 import { NotFoundError } from "@/errors/not-found-error";
+
 import { UnauthorizedError } from "@/errors/unauthorized-error";
 
-export async function updateAthleteThread(app: FastifyInstance) {
+export async function updateAthleteObservation(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>().register(auth).put("/athletes/:athleteId/areas/:areaName/thread/observations/:observationId", {
         schema: {
             tags: ["Threads"],
@@ -27,7 +28,7 @@ export async function updateAthleteThread(app: FastifyInstance) {
                     "PSYCHOPEDAGOGY",
                     "PHYSICAL_EDUCATION",
                 ]),
-                observationId: z.number()
+                observationId: z.coerce.number()
             }),
             body: z.object({
                 content: z.string()

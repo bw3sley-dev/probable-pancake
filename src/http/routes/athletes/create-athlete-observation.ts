@@ -10,7 +10,7 @@ import { ZodTypeProvider } from "fastify-type-provider-zod";
 
 import z from "zod";
 
-export async function createAthleteThread(app: FastifyInstance) {
+export async function createAthleteObservation(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>().register(auth).post("/athletes/:athleteId/areas/:areaName/thread/observations", {
         schema: {
             tags: ["Athletes"],

@@ -1,4 +1,5 @@
 import { NotFoundError } from "@/errors/not-found-error";
+
 import { auth } from "@/http/middlewares/auth";
 
 import { prisma } from "@/lib/prisma";
@@ -9,11 +10,11 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
 import z from "zod";
 
-export async function getAthleteThread(app: FastifyInstance) {
+export async function getAthleteObservation(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>().register(auth).get("/athletes/:athleteId/areas/:areaName/thread", {
         schema: {
             tags: ["Athletes"],
-            summary: "Get the thread for a given area of an athlete",
+            summary: "Get the thread observations for a given area of an athlete",
             params: z.object({
                 athleteId: z.string().uuid(),
                 areaName: z.enum([
@@ -39,6 +40,7 @@ export async function getAthleteThread(app: FastifyInstance) {
                                 id: z.number(),
                                 
                                 content: z.string().nullable(),
+                                edited: z.boolean(),
                                 
                                 createdAt: z.string(),
                                 
@@ -48,6 +50,7 @@ export async function getAthleteThread(app: FastifyInstance) {
                                 }),
                             })
                         ),
+
                         createdAt: z.string(),
                     }).nullable(),
                 }),
@@ -100,6 +103,7 @@ export async function getAthleteThread(app: FastifyInstance) {
                     id: observation.id,
 
                     content: observation.content,
+                    edited: observation.createdAt.getTime() !== observation.updatedAt?.getTime(),
 
                     createdAt: observation.createdAt.toISOString(),
 

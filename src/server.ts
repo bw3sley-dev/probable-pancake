@@ -44,9 +44,10 @@ import { changeEmail } from "./http/routes/account/change-email";
 import { changePassword } from "./http/routes/account/change-password";
 import { updateAccount } from "./http/routes/account/update-account";
 
-import { getAthleteThread } from "./http/routes/athletes/get-athlete-thread";
-import { createAthleteThread } from "./http/routes/athletes/create-athlete-thread";
-import { updateAthleteThread } from "./http/routes/athletes/update-athlete-thread";
+import { getAthleteObservation } from "./http/routes/athletes/get-athlete-observation";
+import { createAthleteObservation } from "./http/routes/athletes/create-athlete-observation";
+import { updateAthleteObservation } from "./http/routes/athletes/update-athlete-observation";
+import { removeAthleteObservation } from "./http/routes/athletes/remove-athlete-observation";
 
 const app = fastify().withTypeProvider<ZodTypeProvider>();
 
@@ -93,10 +94,10 @@ app.register(getProfile);
 app.register(requestPasswordRecover);
 app.register(resetPassword);
 
-app.register(getMembers);
-app.register(removeMember);
-app.register(updateMember);
 app.register(changeMemberArea);
+app.register(getMembers);
+app.register(updateMember);
+app.register(removeMember);
 
 app.register(changeEmail);
 app.register(changePassword);
@@ -109,18 +110,19 @@ app.register(getAverageAgeAmount);
 app.register(getGuardiansAmount);
 app.register(getAthletesLastWeekAmount);
 
-app.register(createAthlete);
 app.register(getAthlete);
 app.register(getAthletes);
-app.register(removeAthlete);
+app.register(createAthlete);
 app.register(updateAthlete);
+app.register(removeAthlete);
 
 app.register(updateAthleteAddress);
 app.register(updateAthleteGuardian);
 
-app.register(getAthleteThread);
-app.register(createAthleteThread);
-app.register(updateAthleteThread);
+app.register(getAthleteObservation);
+app.register(createAthleteObservation);
+app.register(updateAthleteObservation);
+app.register(removeAthleteObservation);
 
 app.listen({
     host: "0.0.0.0",
