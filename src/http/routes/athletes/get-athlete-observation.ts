@@ -11,9 +11,9 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 
 export async function getAthleteObservation(app: FastifyInstance) {
-    app.withTypeProvider<ZodTypeProvider>().register(auth).get("/athletes/:athleteId/areas/:areaName/thread", {
+    app.withTypeProvider<ZodTypeProvider>().register(auth).get("/athletes/:athleteId/areas/:areaName/thread/observations", {
         schema: {
-            tags: ["Athletes"],
+            tags: ["Threads"],
             summary: "Get the thread observations for a given area of an athlete",
             params: z.object({
                 athleteId: z.string().uuid(),

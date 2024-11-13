@@ -22,7 +22,7 @@ export async function requestPasswordRecover(app: FastifyInstance) {
         const { email } = request.body;
 
         const userFromEmail = await prisma.member.findUnique({
-            where: { email }
+            where: { email, deleteAt: null }
         })
 
         if (!userFromEmail) {

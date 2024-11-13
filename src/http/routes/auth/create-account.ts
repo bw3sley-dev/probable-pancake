@@ -39,9 +39,7 @@ export async function createAccount(app: FastifyInstance) {
         const { name, email, phone, password, role, areas } = request.body;
 
         const userWithSameEmail = await prisma.member.findUnique({
-            where: {
-                email
-            }
+            where: { email, deleteAt: null }
         });
 
         if (userWithSameEmail) {

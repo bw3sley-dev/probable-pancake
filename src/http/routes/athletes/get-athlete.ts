@@ -30,6 +30,7 @@ export async function getAthlete(app: FastifyInstance) {
                         handedness: z.string(),
                         bloodType: z.string(),
                         birthDate: z.string(),
+                        observation: z.string().nullable()
                     }),
 
                     address: z.object({
@@ -122,6 +123,8 @@ export async function getAthlete(app: FastifyInstance) {
                 handedness: athlete.handedness,
     
                 birthDate: dayjs(athlete.birthDate).format("DD/MM/YYYY"),
+
+                observation: completionPercentage > 90 ? anamnesis.IAObservation : null 
             },
 
             address: athlete.address ? {

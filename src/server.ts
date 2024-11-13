@@ -49,6 +49,8 @@ import { createAthleteObservation } from "./http/routes/athletes/create-athlete-
 import { updateAthleteObservation } from "./http/routes/athletes/update-athlete-observation";
 import { removeAthleteObservation } from "./http/routes/athletes/remove-athlete-observation";
 
+import { generateAIObservation } from "./http/routes/llama/generate-ai-observation";
+
 const app = fastify().withTypeProvider<ZodTypeProvider>();
 
 app.setValidatorCompiler(validatorCompiler);
@@ -123,6 +125,8 @@ app.register(getAthleteObservation);
 app.register(createAthleteObservation);
 app.register(updateAthleteObservation);
 app.register(removeAthleteObservation);
+
+app.register(generateAIObservation);
 
 app.listen({
     host: "0.0.0.0",

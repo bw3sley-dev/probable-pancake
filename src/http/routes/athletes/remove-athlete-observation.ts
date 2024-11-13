@@ -13,13 +13,21 @@ import { NotFoundError } from "@/errors/not-found-error";
 import { UnauthorizedError } from "@/errors/unauthorized-error";
 
 export async function removeAthleteObservation(app: FastifyInstance) {
-    app.withTypeProvider<ZodTypeProvider>().register(auth).delete("/athletes/:athleteId/threads/:threadId/observations/:observationId", {
+    app.withTypeProvider<ZodTypeProvider>().register(auth).delete("/athletes/:athleteId/areas/:areaName/observations/:observationId", {
         schema: {
-            tags: ["Athletes"],
+            tags: ["Threads"],
             summary: "Remove an observation from a thread of an athlete",
             params: z.object({
                 athleteId: z.string().uuid(),
-                threadId: z.coerce.number(),
+                areaName: z.enum([
+                    "UNSPECIFIED",
+                    "PSYCHOLOGY",
+                    "PHYSIOTHERAPY",
+                    "NUTRITION",
+                    "NURSING",
+                    "PSYCHOPEDAGOGY",
+                    "PHYSICAL_EDUCATION",
+                ]),
                 observationId: z.coerce.number(),
             }),
             response: {
@@ -27,9 +35,28 @@ export async function removeAthleteObservation(app: FastifyInstance) {
             }
         }
     }, async (request, reply) => {
-        const { athleteId, threadId, observationId } = request.params;
+        const { athleteId, areaName, observationId } = request.params;
         
         const userId = await request.getCurrentUserId();
+
+        const area = await prisma.area.findUnique({
+            where: { name: areaName }
+        })
+
+        if (!area) {
+            throw new NotFoundError("Area not found");
+        }
+
+        const thread = await prisma.thread.findFirst({
+            where: {
+                athleteId,
+                areaId: area.id
+            }
+        })
+
+        if (!thread) {
+            throw new NotFoundError("Thread not found for the specified area and athlete");
+        }
 
         const observation = await prisma.observation.findUnique({
             where: { id: observationId },
@@ -39,7 +66,7 @@ export async function removeAthleteObservation(app: FastifyInstance) {
             }
         })
 
-        if (!observation || observation.thread.athleteId !== athleteId || observation.threadId !== threadId) {
+        if (!observation || observation.thread.athleteId !== athleteId || observation.threadId !== thread.id) {
             throw new NotFoundError("Observation not found for the specified thread and athlete");
         }
 

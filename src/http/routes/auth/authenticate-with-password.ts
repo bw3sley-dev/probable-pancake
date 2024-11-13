@@ -29,7 +29,7 @@ export async function authenticateWithPassword(app: FastifyInstance) {
         const { email, password } = request.body;
 
         const userFromEmail = await prisma.member.findUnique({
-            where: { email },
+            where: { email, deleteAt: null },
 
             include: {
                 areas: {
@@ -59,7 +59,7 @@ export async function authenticateWithPassword(app: FastifyInstance) {
             {
                 sub: userFromEmail.id,
                 role: userFromEmail.role,
-                area: userFromEmail.areas
+                area: userFromEmail.areas.map(item => item.area.name)
             },
 
             {
