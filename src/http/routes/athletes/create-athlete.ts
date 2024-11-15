@@ -70,23 +70,18 @@ export async function createAthlete(app: FastifyInstance) {
                 }
             })
     
-            const anamnesis = await prisma.form.upsert({
-                where: { slug: "anamnesis" },
-    
-                update: {},
-    
-                create: {
-                    name: "Anamnese",
-                    slug: "anamnesis"
-                }
+            const anamnesis = await prisma.form.findUnique({
+                where: { slug: "anamnesis" }
             })
-    
-            await prisma.athleteForm.create({
-                data: {
-                    athleteId: athlete.id,
-                    formId: anamnesis.id
-                }
-            })
+
+            if (anamnesis) {
+                await prisma.athleteForm.create({
+                    data: {
+                        athleteId: athlete.id,
+                        formId: anamnesis.id
+                    }
+                })
+            }
 
             return athlete;
         })
