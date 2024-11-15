@@ -47,8 +47,8 @@ export async function createAthlete(app: FastifyInstance) {
 
         const userId = await request.getCurrentUserId();
 
-        await prisma.$transaction(async (prisma) => {
-            const newAthlete = await prisma.athlete.create({
+        const newAthlete = await prisma.$transaction(async (prisma) => {
+            const athlete = await prisma.athlete.create({
                 data: {
                     name,
                     gender,
@@ -83,36 +83,38 @@ export async function createAthlete(app: FastifyInstance) {
     
             await prisma.athleteForm.create({
                 data: {
-                    athleteId: newAthlete.id,
+                    athleteId: athlete.id,
                     formId: anamnesis.id
                 }
             })
 
-            const areaNames = [
-                "UNSPECIFIED",
-                "PSYCHOLOGY",
-                "PHYSIOTHERAPY",
-                "NUTRITION",
-                "NURSING",
-                "PSYCHOPEDAGOGY",
-                "PHYSICAL_EDUCATION"
-            ];
-
-            for (const areaName of areaNames) {
-                const area = await prisma.area.upsert({
-                    where: { name: areaName as Specialties },
-                    create: { name: areaName as Specialties },
-                    update: {}
-                });
-
-                await prisma.thread.create({
-                    data: {
-                        athleteId: newAthlete.id,
-                        areaId: area.id,
-                    }
-                });
-            }
+            return athlete;
         })
+
+        const areaNames = [
+            "UNSPECIFIED",
+            "PSYCHOLOGY",
+            "PHYSIOTHERAPY",
+            "NUTRITION",
+            "NURSING",
+            "PSYCHOPEDAGOGY",
+            "PHYSICAL_EDUCATION"
+        ]
+
+        for (const areaName of areaNames) {
+            const area = await prisma.area.upsert({
+                where: { name: areaName as Specialties },
+                create: { name: areaName as Specialties },
+                update: {}
+            })
+
+            await prisma.thread.create({
+                data: {
+                    athleteId: newAthlete.id,
+                    areaId: area.id,
+                }
+            })
+        }
 
         return reply.status(201).send();
     })

@@ -26,7 +26,7 @@ export async function getAthletesLastWeekAmount(app: FastifyInstance) {
     }, async (request, reply) => {
         const today = dayjs();
 
-        const lastWeek = today.subtract(7, "day");
+        const lastWeek = today.subtract(6, "day");
 
         const athletes = await prisma.athlete.findMany({
             where: {

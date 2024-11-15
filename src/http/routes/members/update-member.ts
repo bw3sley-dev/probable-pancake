@@ -41,20 +41,20 @@ export async function updateMember(app: FastifyInstance) {
 
         const { name, email, phone, role, areas } = request.body;
 
-        await prisma.$transaction(async (context) => {
-            await context.member.update({
+        await prisma.$transaction(async (prisma) => {
+            await prisma.member.update({
                 where: { id: memberId },
                 data: { name, email, phone, role }
             })
 
-            const existingAreas = await context.memberArea.findMany({
+            const existingAreas = await prisma.memberArea.findMany({
                 where: { memberId },
                 select: { areaId: true }
             })
 
             const existingAreaIds = existingAreas.map(item => item.areaId);
 
-            const areaRecords = await context.area.findMany({
+            const areaRecords = await prisma.area.findMany({
                 where: { name: { in: areas } },
                 select: { id: true, name: true }
             })
@@ -66,11 +66,8 @@ export async function updateMember(app: FastifyInstance) {
             const areasToAdd = newAreaIds.filter(id => !existingAreaIds.includes(id));
             const areasToRemove = existingAreaIds.filter(id => !newAreaIds.includes(id));
 
-            console.log(areasToAdd);
-            console.log(areasToRemove);
-
             if (areasToAdd.length > 0) {
-                await context.memberArea.createMany({
+                await prisma.memberArea.createMany({
                     data: areasToAdd.map(areaId => ({
                         memberId,
                         areaId
@@ -81,14 +78,14 @@ export async function updateMember(app: FastifyInstance) {
             }
 
             if (areasToRemove.length > 0) {
-                await context.memberArea.deleteMany({
+                await prisma.memberArea.deleteMany({
                     where: {
                         memberId,
                         areaId: { in: areasToRemove }
                     }
                 })
             }
-        });
+        })
 
         return reply.status(204).send();
     })

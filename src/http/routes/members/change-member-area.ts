@@ -39,7 +39,7 @@ export async function changeMemberArea(app: FastifyInstance) {
         const { areas } = request.body;
 
         const member = await prisma.member.findUnique({
-            where: { id: memberId },
+            where: { id: memberId }
         })
 
         if (!member) {
@@ -64,25 +64,26 @@ export async function changeMemberArea(app: FastifyInstance) {
         const areasToAdd = [...newAreaIds].filter(areaId => !existingAreaIds.has(areaId));
         const areasToRemove = [...existingAreaIds].filter(areaId => !newAreaIds.has(areaId));
 
-        await prisma.$transaction(async (prisma) => {
-            if (areasToRemove.length > 0) {
-                await prisma.memberArea.deleteMany({
-                    where: {
-                        memberId,
-                        areaId: { in: areasToRemove }
-                    }
-                })
-            }
+        if (areasToRemove.length > 0) {
+            await prisma.memberArea.deleteMany({
+                where: {
+                    memberId,
+                    areaId: { in: areasToRemove }
+                }
+            })
+        }
 
-            for (const areaId of areasToAdd) {
-                await prisma.memberArea.create({
-                    data: {
-                        memberId,
-                        areaId
-                    }
-                })
-            }
-        })
+        if (areasToAdd.length > 0) {
+            const dataToCreate = areasToAdd.map(areaId => ({
+                memberId,
+                areaId
+            }))
+
+            await prisma.memberArea.createMany({
+                data: dataToCreate,
+                skipDuplicates: true
+            })
+        }
 
         return reply.status(204).send();
     })

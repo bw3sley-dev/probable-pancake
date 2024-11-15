@@ -40,7 +40,7 @@ export async function createAccount(app: FastifyInstance) {
 
         const userWithSameEmail = await prisma.member.findUnique({
             where: { email, deleteAt: null }
-        });
+        })
 
         if (userWithSameEmail) {
             throw new BadRequestError("User with same e-mail already exists.");
@@ -48,8 +48,29 @@ export async function createAccount(app: FastifyInstance) {
 
         const passwordHash = await hash(password, 6);
 
-        await prisma.$transaction(async (context) => {
-            const newMember = await context.member.create({
+        const areasRecords = await prisma.area.findMany({
+            where: {
+                name: { in: areas }
+            }
+        })
+
+        const existingAreasNames = areasRecords.map(area => area.name);
+        const areasToCreate = areas.filter(area => !existingAreasNames.includes(area));
+
+        const createdAreas = await Promise.all(
+            areasToCreate.map(areaName =>
+                prisma.area.upsert({
+                    where: { name: areaName },
+                    create: { name: areaName },
+                    update: {}
+                })
+            )
+        )
+
+        const allAreas = [...areasRecords, ...createdAreas];
+
+        await prisma.$transaction(async (prisma) => {
+            const newMember = await prisma.member.create({
                 data: {
                     name,
                     email,
@@ -57,37 +78,18 @@ export async function createAccount(app: FastifyInstance) {
                     phone,
                     role
                 }
-            });
+            })
 
-            if (areas.length > 0) {
-                const areasRecords = await context.area.findMany({
-                    where: {
-                        name: { in: areas }
-                    }
-                });
-
-                const existingAreasNames = areasRecords.map(area => area.name);
-                const areasToCreate = areas.filter(area => !existingAreasNames.includes(area));
-
-                const createdAreas = await Promise.all(
-                    areasToCreate.map(areaName =>
-                        context.area.create({
-                            data: { name: areaName }
-                        })
-                    )
-                );
-
-                const allAreas = [...areasRecords, ...createdAreas];
-                
-                await context.memberArea.createMany({
+            if (allAreas.length > 0) {
+                await prisma.memberArea.createMany({
                     data: allAreas.map(area => ({
                         memberId: newMember.id,
                         areaId: area.id
                     }))
-                });
+                })
             }
-        });
+        })
 
         return reply.status(201).send();
-    });
+    })
 }
