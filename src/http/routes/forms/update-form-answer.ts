@@ -56,47 +56,40 @@ export async function updateFormAnswer(app: FastifyInstance) {
                     },
                 },
             },
-        })
+        });
 
         if (!athleteForm) {
             throw new NotFoundError("Form not found for athlete");
         }
 
-        await Promise.all(
-            questions.map(async (question) => {
-                await prisma.question.update({
-                    where: { id: question.id },
-                    data: {
-                        observation: question.observation ?? null,
-                    },
-                });
-            })
-        )
+        // Preserve existing answers and update with new ones
+        const existingData = athleteForm.answer?.data as Record<string, { answer: string | string[], observation?: string | null }> || {};
+        const updatedData = { ...existingData };
 
-        const data = questions.reduce((acc, question) => {
-            acc[question.id] = question.answer;
-            
-            return acc;
-        }, {} as Record<number, string | string[]>);
+        questions.forEach((question) => {
+            updatedData[question.id.toString()] = {
+                answer: question.answer,
+                observation: question.observation ?? null,
+            };
+        });
 
         const answer = athleteForm.answer;
 
         if (!answer) {
             await prisma.answer.create({
                 data: {
-                    data: data,
+                    data: updatedData,
                     athleteFormId: athleteForm.id
                 }
-            })
-        } 
-        
+            });
+        }
         else {
             await prisma.answer.update({
                 where: { id: answer.id },
-                data: { data: data }
-            })
+                data: { data: updatedData }
+            });
         }
 
         return reply.status(204).send();
-    })
+    });
 }

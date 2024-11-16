@@ -29,29 +29,29 @@ export async function getForm(app: FastifyInstance) {
 
                     form: z.object({
                         id: z.string(),
-                        
+
                         title: z.string(),
                         slug: z.string(),
-                        
+
                         sections: z.array(
                             z.object({
                                 id: z.number(),
-                                
+
                                 title: z.string(),
                                 icon: z.string(),
-                                
+
                                 questions: z.array(
                                     z.object({
                                         id: z.number(),
-                                        
+
                                         title: z.string(),
                                         type: z.enum(["TEXTAREA", "INPUT", "CHECKBOX", "SELECT", "MULTI_SELECT", "DATE", "RADIO"]),
 
                                         description: z.string().nullable(),
                                         observation: z.string().nullable(),
-                                        
+
                                         answer: z.union([z.string(), z.array(z.string())]).nullable(),
-                                        
+
                                         options: z.array(
                                             z.object({
                                                 label: z.string(),
@@ -83,13 +83,13 @@ export async function getForm(app: FastifyInstance) {
                                     },
 
                                     orderBy: {
-                                        id: "asc", 
+                                        id: "asc",
                                     }
                                 }
                             },
 
                             orderBy: {
-                                id: "asc", 
+                                id: "asc",
                             }
                         }
                     }
@@ -104,7 +104,7 @@ export async function getForm(app: FastifyInstance) {
                     }
                 }
             }
-        })
+        });
 
         if (!athleteForm) {
             throw new NotFoundError("Form not found for the specified athlete");
@@ -112,7 +112,7 @@ export async function getForm(app: FastifyInstance) {
 
         const { form, athlete, answer } = athleteForm;
 
-        const answerData = (answer?.data || {}) as Record<number, string | string[] | string>;
+        const answerData = (answer?.data || {}) as Record<string, { answer: string | string[], observation?: string | null }>;
 
         const response = {
             athlete: {
@@ -122,36 +122,42 @@ export async function getForm(app: FastifyInstance) {
 
             form: {
                 id: form.id,
-                
+
                 title: form.name,
                 slug: form.slug,
-                
+
                 sections: form.sections.map((section) => ({
                     id: section.id,
-                    
+
                     title: section.title,
                     icon: section.icon,
-                    
-                    questions: section.questions.map((question) => ({
-                        id: question.id,
-                        
-                        title: question.title,
-                        type: question.type,
-                        
-                        description: question.description ?? null,
-                        observation: question.observation ?? null,
-                        
-                        answer: answerData[question.id] ?? "",
-                        
-                        options: question.options.map((option) => ({
-                            label: option.label,
-                            value: option.value
-                        }))
-                    }))
+
+                    questions: section.questions.map((question) => {
+                        const answerEntry = answerData[question.id.toString()];
+
+                        return {
+                            id: question.id,
+
+                            title: question.title,
+                            type: question.type,
+
+                            description: question.description ?? null,
+                            observation: answerEntry?.observation ?? null,
+
+                            answer: typeof answerEntry?.answer === "string" || Array.isArray(answerEntry?.answer)
+                                ? answerEntry.answer
+                                : "",
+
+                            options: question.options.map((option) => ({
+                                label: option.label,
+                                value: option.value
+                            }))
+                        };
+                    })
                 }))
             },
-        }
+        };
 
         return reply.send(response);
-    })
+    });
 }
