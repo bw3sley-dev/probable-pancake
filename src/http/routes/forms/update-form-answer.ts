@@ -1,8 +1,13 @@
 import { NotFoundError } from "@/errors/not-found-error";
+
 import { auth } from "@/http/middlewares/auth";
+
 import { prisma } from "@/lib/prisma";
+
 import type { FastifyInstance } from "fastify";
+
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
+
 import z from "zod";
 
 export async function updateFormAnswer(app: FastifyInstance) {
@@ -30,48 +35,68 @@ export async function updateFormAnswer(app: FastifyInstance) {
         },
     }, async (request, reply) => {
         const { athleteId, slug } = request.params;
+
         const { questions } = request.body;
 
-        // Buscar o formulário do atleta
         const athleteForm = await prisma.athleteForm.findFirst({
             where: {
                 athleteId,
-                form: {
-                    slug,
-                },
+                form: { slug },
             },
+
             include: {
                 answer: true,
+                form: {
+                    include: {
+                        sections: {
+                            include: {
+                                questions: true,
+                            },
+                        },
+                    },
+                },
             },
-        });
+        })
 
         if (!athleteForm) {
-            throw new NotFoundError("Form not found for the specified athlete");
+            throw new NotFoundError("Form not found for athlete");
         }
 
-        // Processar os dados para garantir compatibilidade com o formato esperado pela rota de listagem
-        const existingAnswers = (athleteForm.answer?.data || {}) as Record<number, string | string[]>;
+        await Promise.all(
+            questions.map(async (question) => {
+                await prisma.question.update({
+                    where: { id: question.id },
+                    data: {
+                        observation: question.observation ?? null,
+                    },
+                });
+            })
+        )
 
-        questions.forEach((question) => {
-            existingAnswers[question.id] = question.answer; // Atualiza ou insere a resposta
-        });
+        const data = questions.reduce((acc, question) => {
+            acc[question.id] = question.answer;
+            
+            return acc;
+        }, {} as Record<number, string | string[]>);
 
-        if (!athleteForm.answer) {
-            // Criar nova entrada na tabela de respostas
+        const answer = athleteForm.answer;
+
+        if (!answer) {
             await prisma.answer.create({
                 data: {
-                    data: existingAnswers,
-                    athleteFormId: athleteForm.id,
-                },
-            });
-        } else {
-            // Atualizar a entrada existente
+                    data: data,
+                    athleteFormId: athleteForm.id
+                }
+            })
+        } 
+        
+        else {
             await prisma.answer.update({
-                where: { id: athleteForm.answer.id },
-                data: { data: existingAnswers },
-            });
+                where: { id: answer.id },
+                data: { data: data }
+            })
         }
 
         return reply.status(204).send();
-    });
+    })
 }

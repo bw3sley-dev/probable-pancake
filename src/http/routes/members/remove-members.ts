@@ -26,11 +26,11 @@ export async function removeMember(app: FastifyInstance) {
     }, async (request, reply) => {
         const { memberId } = request.params;
 
-        prisma.memberArea.deleteMany({
+        await prisma.memberArea.deleteMany({
             where: { memberId }
         }),
 
-        prisma.member.update({
+        await prisma.member.update({
             where: { id: memberId },
 
             data: {

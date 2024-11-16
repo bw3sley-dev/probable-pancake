@@ -49,25 +49,8 @@ export async function createAccount(app: FastifyInstance) {
         const passwordHash = await hash(password, 6);
 
         const areasRecords = await prisma.area.findMany({
-            where: {
-                name: { in: areas }
-            }
+            where: { name: { in: areas } }
         })
-
-        const existingAreasNames = areasRecords.map(area => area.name);
-        const areasToCreate = areas.filter(area => !existingAreasNames.includes(area));
-
-        const createdAreas = await Promise.all(
-            areasToCreate.map(areaName =>
-                prisma.area.upsert({
-                    where: { name: areaName },
-                    create: { name: areaName },
-                    update: {}
-                })
-            )
-        )
-
-        const allAreas = [...areasRecords, ...createdAreas];
 
         await prisma.$transaction(async (prisma) => {
             const newMember = await prisma.member.create({
@@ -80,9 +63,9 @@ export async function createAccount(app: FastifyInstance) {
                 }
             })
 
-            if (allAreas.length > 0) {
+            if (areasRecords.length > 0) {
                 await prisma.memberArea.createMany({
-                    data: allAreas.map(area => ({
+                    data: areasRecords.map(area => ({
                         memberId: newMember.id,
                         areaId: area.id
                     }))

@@ -24,7 +24,7 @@ export async function getGuardiansAmount(app: FastifyInstance) {
         const amount = await prisma.guardian.count({
             where: {
                 name: {
-                    not: null
+                    not: null || "",
                 }
             }
         });

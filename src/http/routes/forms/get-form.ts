@@ -70,10 +70,7 @@ export async function getForm(app: FastifyInstance) {
         const { athleteId, slug } = request.params;
 
         const athleteForm = await prisma.athleteForm.findFirst({
-            where: {
-                athleteId,
-                form: { slug }
-            },
+            where: { athleteId, form: { slug } },
 
             include: {
                 form: {
@@ -84,10 +81,18 @@ export async function getForm(app: FastifyInstance) {
                                     include: {
                                         options: true
                                     },
-                                },
+
+                                    orderBy: {
+                                        id: "asc", 
+                                    }
+                                }
                             },
-                        },
-                    },
+
+                            orderBy: {
+                                id: "asc", 
+                            }
+                        }
+                    }
                 },
 
                 answer: true,
@@ -98,8 +103,8 @@ export async function getForm(app: FastifyInstance) {
                         name: true
                     }
                 }
-            },
-        });
+            }
+        })
 
         if (!athleteForm) {
             throw new NotFoundError("Form not found for the specified athlete");

@@ -36,6 +36,18 @@ async function seed() {
             ]
         })
 
+        await prisma.area.createMany({
+            data: [
+                { name: "UNSPECIFIED" },
+                { name: "PSYCHOLOGY" },
+                { name: "PHYSIOTHERAPY" },
+                { name: "NUTRITION" },
+                { name: "NURSING" },
+                { name: "PSYCHOPEDAGOGY" },
+                { name: "PHYSICAL_EDUCATION" }
+            ]
+        })
+
         await prisma.form.create({
             data: {
                 name: "Anamnese",
@@ -49,6 +61,11 @@ async function seed() {
 
                             questions: {
                                 create: [
+                                    {
+                                        title: "Código Internacional de Doenças (CID)",
+                                        type: "INPUT"
+                                    },
+
                                     {
                                         title: "Local de nascimento",
                                         type: "INPUT"
@@ -660,18 +677,13 @@ async function seed() {
                                         options: {
                                             create: [
                                                 {
-                                                    label: "Diariamente",
-                                                    value: "diariamente"
+                                                    label: "Supermercado",
+                                                    value: "supermercado"
                                                 },
 
                                                 {
-                                                    label: "Semanalmente",
-                                                    value: "semanalmente"
-                                                },
-
-                                                {
-                                                    label: "Quinzenalmente",
-                                                    value: "quinzenalmente"
+                                                    label: "Feira",
+                                                    value: "feira"
                                                 }
                                             ]
                                         }
@@ -679,12 +691,12 @@ async function seed() {
 
                                     {
                                         title: "Quem prepara as refeições?",
-                                        type: "INPUT",
+                                        type: "TEXTAREA",
                                     },
 
                                     {
                                         title: "Onde as refeições são realizadas?",
-                                        type: "INPUT",
+                                        type: "TEXTAREA",
                                     },
 
                                     {
