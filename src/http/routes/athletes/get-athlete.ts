@@ -124,7 +124,7 @@ export async function getAthlete(app: FastifyInstance) {
     
                 birthDate: dayjs(athlete.birthDate).format("DD/MM/YYYY"),
 
-                observation: completionPercentage > 90 ? anamnesis.IAObservation : null 
+                observation: completionPercentage > 80 ? anamnesis.IAObservation : null 
             },
 
             address: athlete.address ? {
