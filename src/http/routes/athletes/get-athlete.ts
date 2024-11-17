@@ -96,7 +96,7 @@ export async function getAthlete(app: FastifyInstance) {
         })
 
         if (!athlete) {
-            throw new NotFoundError("Athlete not found");
+            throw new NotFoundError("Atleta não encontrado");
         }
 
         const anamnesis = athlete.forms[0];

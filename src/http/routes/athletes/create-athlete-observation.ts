@@ -46,7 +46,7 @@ export async function createAthleteObservation(app: FastifyInstance) {
         })
 
         if (!area) {
-            throw new NotFoundError("Area not found");
+            throw new NotFoundError("Área não encontrada");
         }
 
         const thread = await prisma.thread.findFirst({
@@ -57,7 +57,7 @@ export async function createAthleteObservation(app: FastifyInstance) {
         })
 
         if (!thread) {
-            throw new NotFoundError("Thread not found");
+            throw new NotFoundError("Thread não encontrada");
         }
 
         await prisma.observation.create({

@@ -41,7 +41,7 @@ export async function updateAthleteAddress(app: FastifyInstance) {
         }) 
 
         if (!athlete) {
-            throw new NotFoundError("Athlete not found");
+            throw new NotFoundError("Atleta não encontrado");
         }
 
         const { street, neighborhood, postalCode, complement, number, city, uf, country } = request.body;

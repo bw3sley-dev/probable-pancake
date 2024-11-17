@@ -42,7 +42,7 @@ export async function generateAIObservation(app: FastifyInstance) {
         })
 
         if (!athleteForm || !athleteForm.answer) {
-            throw new NotFoundError("Anamnesis data not found for the athlete");
+            throw new NotFoundError("Atleta não tem 80% da anamnese feito");
         }
 
         const anamnesis = athleteForm.answer.data;
@@ -77,7 +77,7 @@ export async function generateAIObservation(app: FastifyInstance) {
         const observation = completion.choices[0].message.content?.trim();
 
         if (!observation) {
-            throw new Error("Failed to generate AI observation");
+            throw new Error("Falha ao gerar observação com IA");
         }
 
         await prisma.athleteForm.update({

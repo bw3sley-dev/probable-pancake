@@ -44,7 +44,7 @@ export async function updateAccount(app: FastifyInstance) {
         })
 
         if (!user) {
-            throw new NotFoundError("User not found");
+            throw new NotFoundError("Usuário não encontrado");
         }
 
         await prisma.member.update({

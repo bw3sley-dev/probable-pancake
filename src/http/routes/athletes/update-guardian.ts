@@ -43,7 +43,7 @@ export async function updateAthleteGuardian(app: FastifyInstance) {
         })
 
         if (!athlete) {
-            throw new NotFoundError("Athlete not found");
+            throw new NotFoundError("Atleta não encontrado");
         }
 
         await prisma.guardian.update({

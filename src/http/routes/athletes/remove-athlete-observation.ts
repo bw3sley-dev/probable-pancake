@@ -44,7 +44,7 @@ export async function removeAthleteObservation(app: FastifyInstance) {
         })
 
         if (!area) {
-            throw new NotFoundError("Area not found");
+            throw new NotFoundError("Área não encontrada");
         }
 
         const thread = await prisma.thread.findFirst({
@@ -55,7 +55,7 @@ export async function removeAthleteObservation(app: FastifyInstance) {
         })
 
         if (!thread) {
-            throw new NotFoundError("Thread not found for the specified area and athlete");
+            throw new NotFoundError("Thread não encontrada para a área e atleta");
         }
 
         const observation = await prisma.observation.findUnique({
@@ -66,12 +66,12 @@ export async function removeAthleteObservation(app: FastifyInstance) {
             }
         })
 
-        if (!observation || observation.thread.athleteId !== athleteId || observation.threadId !== thread.id) {
-            throw new NotFoundError("Observation not found for the specified thread and athlete");
+        if (!observation) {
+            throw new NotFoundError("Observação não encontrada");
         }
 
         if (observation.memberId !== userId) {
-            throw new UnauthorizedError("You do not have permission to delete this observation");
+            throw new UnauthorizedError("Você não tem permissão para deletar essa observação");
         }
 
         await prisma.observation.delete({

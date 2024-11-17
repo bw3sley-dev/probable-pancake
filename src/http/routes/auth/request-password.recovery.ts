@@ -66,7 +66,7 @@ export async function requestPasswordRecover(app: FastifyInstance) {
         catch (error) {
             console.log(error);
 
-            throw new Error("Failed to send password recorey e-mail");
+            throw new Error("Falha ao enviar e-mail para recuperação de senha");
         }
 
         return reply.status(201).send();

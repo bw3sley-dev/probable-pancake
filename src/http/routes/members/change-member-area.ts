@@ -43,7 +43,7 @@ export async function changeMemberArea(app: FastifyInstance) {
         })
 
         if (!member) {
-            throw new NotFoundError("Member not found");
+            throw new NotFoundError("Usuário não encontrado");
         }
 
         const existingAreas = await prisma.memberArea.findMany({

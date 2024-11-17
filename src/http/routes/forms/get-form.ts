@@ -107,7 +107,7 @@ export async function getForm(app: FastifyInstance) {
         });
 
         if (!athleteForm) {
-            throw new NotFoundError("Form not found for the specified athlete");
+            throw new NotFoundError("Formulário não encontrado para o atleta");
         }
 
         const { form, athlete, answer } = athleteForm;

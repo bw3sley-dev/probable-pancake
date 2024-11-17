@@ -59,10 +59,9 @@ export async function updateFormAnswer(app: FastifyInstance) {
         });
 
         if (!athleteForm) {
-            throw new NotFoundError("Form not found for athlete");
+            throw new NotFoundError("Formulário não encontrado para o atleta");
         }
 
-        // Preserve existing answers and update with new ones
         const existingData = athleteForm.answer?.data as Record<string, { answer: string | string[], observation?: string | null }> || {};
         const updatedData = { ...existingData };
 

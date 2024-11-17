@@ -45,7 +45,7 @@ export async function changeEmail(app: FastifyInstance) {
         })
 
         if (!user) {
-            throw new NotFoundError("User not found");
+            throw new NotFoundError("Usuário não encontrado");
         }
 
         if (user.email === email) {
@@ -55,7 +55,7 @@ export async function changeEmail(app: FastifyInstance) {
         const doesPasswordMatch = await compare(password, user.passwordHash);
 
         if (!doesPasswordMatch) {
-            throw new BadRequestError("Invalid credentials");
+            throw new BadRequestError("Credenciais inválidas");
         }
 
         await prisma.member.update({

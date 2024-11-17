@@ -37,7 +37,7 @@ export async function changePassword(app: FastifyInstance) {
         })
 
         if (!user) {
-            throw new NotFoundError("User not found");
+            throw new NotFoundError("Usuário não encontrado");
         }
 
         const isPasswordTheSame = await compare(newPassword, user.passwordHash);
@@ -49,7 +49,7 @@ export async function changePassword(app: FastifyInstance) {
         const doesPasswordMatch = await compare(currentPassword, user.passwordHash);
 
         if (!doesPasswordMatch) {
-            throw new BadRequestError("Invalid credentials");
+            throw new BadRequestError("Credenciais inválidas");
         }
 
         const newPasswordHash = await hash(newPassword, 6);

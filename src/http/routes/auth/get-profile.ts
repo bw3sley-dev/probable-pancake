@@ -72,7 +72,7 @@ export async function getProfile(app: FastifyInstance) {
         })
 
         if (!user) {
-            throw new BadRequestError("User not found");
+            throw new BadRequestError("Usuário não encontrado");
         }
 
         const areas = user.areas.map(item => ({ name: item.area.name }));
