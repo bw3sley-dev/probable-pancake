@@ -82,6 +82,8 @@ export async function getAthletes(app: FastifyInstance) {
 
         const athleteCount = await prisma.athlete.count({
             where: {
+                deletedAt: null,
+
                 ...(athleteName && {
                     name: { contains: athleteName, mode: "insensitive" }
                 }),
