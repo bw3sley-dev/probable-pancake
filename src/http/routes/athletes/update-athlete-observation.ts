@@ -15,7 +15,7 @@ import { UnauthorizedError } from "@/errors/unauthorized-error";
 export async function updateAthleteObservation(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>().register(auth).put("/athletes/:athleteId/areas/:areaName/thread/observations/:observationId", {
         schema: {
-            tags: ["Threads"],
+            tags: ["Observation"],
             summary: "Update an observation for a given thread of an athlete's area",
             params: z.object({
                 athleteId: z.string().uuid(),

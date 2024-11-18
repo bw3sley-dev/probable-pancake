@@ -15,7 +15,7 @@ import { UnauthorizedError } from "@/errors/unauthorized-error";
 export async function removeAthleteObservation(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>().register(auth).delete("/athletes/:athleteId/areas/:areaName/observations/:observationId", {
         schema: {
-            tags: ["Threads"],
+            tags: ["Observation"],
             summary: "Remove an observation from a thread of an athlete",
             params: z.object({
                 athleteId: z.string().uuid(),

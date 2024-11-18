@@ -13,7 +13,7 @@ import z from "zod";
 export async function createAthleteObservation(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>().register(auth).post("/athletes/:athleteId/areas/:areaName/thread/observations", {
         schema: {
-            tags: ["Threads"],
+            tags: ["Observation"],
             summary: "Create an observation for a thread in a given area of an athlete",
             params: z.object({
                 athleteId: z.string().uuid(),
