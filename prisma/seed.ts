@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker";
+import { env } from "@/env";
 
 import { PrismaClient } from "@prisma/client";
 
@@ -12,28 +12,13 @@ async function seed() {
 
         const passwordHash = await hash("T21-ARENA-PARK", 6);
 
-        await prisma.member.createMany({
-            data: [
-                {
-                    name: "Wesley Bernardes",
-                    email: "bw3sley@gmail.com",
-                    role: "ADMIN",
-                    phone: faker.phone.number(),
-                    avatarUrl: "https://github.com/bw3sley.png",
-                    passwordHash,
-                    createdAt: faker.date.past()
-                },
-
-                {
-                    name: "Eduardo Sato",
-                    email: "eduardo-sato@t21arenapark.com",
-                    role: "ADMIN",
-                    phone: faker.phone.number(),
-                    avatarUrl: faker.image.avatarGitHub(),
-                    passwordHash,
-                    createdAt: faker.date.past()
-                }
-            ]
+        await prisma.member.create({
+            data: {
+                name: "Wesley Bernardes",
+                email: env.POWER_USER,
+                role: "ADMIN",
+                passwordHash
+            }
         })
 
         await prisma.area.createMany({

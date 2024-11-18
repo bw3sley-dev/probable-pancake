@@ -64,9 +64,9 @@ app.setErrorHandler(errorHandler);
 app.register(fastifySwagger, {
     openapi: {
         info: {
-            title: "",
-            description: "",
-            version: ""
+            title: "T21 Arena Park | API docs",
+            description: "API for athlete and volunteer management, including authentication, password recovery, and profile evaluation.",
+            version: "1.0.0"
         },
 
         components: {

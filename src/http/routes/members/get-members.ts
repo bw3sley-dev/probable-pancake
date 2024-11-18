@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import { UnauthorizedError } from "@/errors/unauthorized-error";
 
 import { auth } from "@/http/middlewares/auth";
@@ -70,6 +71,8 @@ export async function getMembers(app: FastifyInstance) {
                 deleteAt: null,
 
                 id: { not: userId },
+
+                email: { not: env.POWER_USER },
 
                 ...(memberName && {
                     name: { contains: memberName, mode: "insensitive" }

@@ -4,6 +4,7 @@ import { z } from "zod";
 
 const envSchema = z.object({
     NODE_ENV: z.enum(["dev", "test", "production"]).default("production"),
+    POWER_USER: z.string().email(),
     JWT_SECRET: z.string(),
     OPENAI_API_KEY: z.string(),
     SMTP_USER: z.string(),
