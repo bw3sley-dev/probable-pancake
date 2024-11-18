@@ -27,6 +27,10 @@ export async function getAnamnesisAmount(app: FastifyInstance) {
                     slug: "anamnesis"
                 },
 
+                athlete: {
+                    deletedAt: null
+                },
+
                 answer: {
                     isNot: null
                 }

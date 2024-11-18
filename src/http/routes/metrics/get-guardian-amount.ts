@@ -25,6 +25,10 @@ export async function getGuardiansAmount(app: FastifyInstance) {
             where: {
                 name: {
                     not: null || "",
+                },
+
+                athlete: {
+                    deletedAt: null
                 }
             }
         });

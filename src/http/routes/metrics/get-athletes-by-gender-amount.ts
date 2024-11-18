@@ -25,6 +25,7 @@ export async function getAthletesByGenderAmount(app: FastifyInstance) {
         const totalMale = await prisma.athlete.count({
             where: {
                 gender: "MALE",
+                
                 deletedAt: null
             }
         })
