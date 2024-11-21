@@ -3,7 +3,7 @@ interface CreateMailHTMLProps {
 }
 
 export function createMailHTML({ code }: CreateMailHTMLProps) {
-  const url = "http://localhost:5173/new-password", email = "oi@t21arenapark.com.br";
+  const url = "http://t21-arena-park.vercel.app/new-password", email = "t21-arena-park@gmail.com";
 
   return `
     <!DOCTYPE html>

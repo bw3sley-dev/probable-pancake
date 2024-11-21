@@ -12,7 +12,7 @@ async function seed() {
 
         const passwordHash = await hash("T21-ARENA-PARK", 6);
 
-        await prisma.member.create({
+        const me = await prisma.member.create({
             data: {
                 name: "Wesley Bernardes",
                 email: env.POWER_USER,
@@ -32,6 +32,15 @@ async function seed() {
                 { name: "PHYSICAL_EDUCATION" }
             ]
         })
+
+        const areas = await prisma.area.findMany();
+
+        await prisma.memberArea.createMany({
+            data: areas.map((area) => ({
+                memberId: me.id,
+                areaId: area.id,
+            })),
+        });
 
         await prisma.form.create({
             data: {
