@@ -398,7 +398,7 @@ async function seed() {
                                     },
 
                                     {
-                                        title: "Histórico de doenças e condições (doença caríaca, trauma de crânio, doença vascular, etc..)?",
+                                        title: "Histórico de doenças e condições (doença cardíaca, trauma de crânio, doença vascular, etc..)?",
                                         type: "TEXTAREA"
                                     },
 
